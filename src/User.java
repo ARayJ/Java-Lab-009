@@ -1,7 +1,7 @@
 public class User {
     private String username;
     private String passHash;
-    public void User(String username, String passHash){
+    public User(String username, String passHash){
         this.username = username;
         this.passHash = passHash;
     }

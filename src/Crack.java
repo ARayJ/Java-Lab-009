@@ -16,12 +16,25 @@ public class Crack {
 
     public Crack(String shadowFile, String dictionary) throws FileNotFoundException {
         this.dictionary = dictionary;
-        dictionary = "C:\\Users\\Aaron\\IdeaProjects\\Java-Lab-009\\resources\\englishSmall.dic";
         this.users = Crack.parseShadow(shadowFile);
     }
 
     public void crack(String dictPath) throws FileNotFoundException {
-        Path filePath = Paths.get(dictPath);
+        Scanner sc = new Scanner(new FileInputStream(this.dictionary), StandardCharsets.UTF_8);
+        while (sc.hasNextLine()) {
+            String word = sc.nextLine();
+            for (User user : users) {
+                if (user.getPassHash().contains("$")) {
+                    String hash = Crypt.crypt(word, user.getPassHash());
+                    if (hash.equals(user.getPassHash())) {
+                        System.out.printf("!!! found password %s for user %s%n", word, user.getUsername());
+
+                    }
+                }
+            }
+        }
+    }
+        /*Path filePath = Paths.get(dictPath);
         File myFile = filePath.toFile();
         FileReader fr = new FileReader(myFile);
         BufferedReader br = new BufferedReader(fr);
@@ -42,8 +55,7 @@ public class Crack {
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
-    }
-
+    }*/  //Yikes, I was WAY off!
     public static int getLineCount(String path) {
         int lineCount = 0;
         try (Stream<String> stream = Files.lines(Path.of(path), StandardCharsets.UTF_8)) {
@@ -54,7 +66,18 @@ public class Crack {
     }
 
     public static User[] parseShadow(String shadowFile) throws FileNotFoundException {
-        String currentLine = String.valueOf(getLineCount(shadowFile));
+        User[] users = new User[Crack.getLineCount(shadowFile)];
+
+        Scanner sc = new Scanner(new FileInputStream(shadowFile), StandardCharsets.UTF_8);
+        int index = 0;
+        while (sc.hasNextLine()) {
+            String[] userLine = sc.nextLine().split(":");
+            users[index] = new User(userLine[0], userLine[1]);
+            index++;
+        }
+        return users;
+    }
+        /*String currentLine = String.valueOf(getLineCount(shadowFile));
         Path filePath = Paths.get(shadowFile);
         File myFile = filePath.toFile();
         FileReader fr = new FileReader(myFile);
@@ -68,7 +91,7 @@ public class Crack {
             throw new RuntimeException(e);
         }
         return new User[0];
-    }
+    }*/ //yeah I was way off again! Yikes!
     public static void main(String[] args) throws FileNotFoundException {
         Scanner sc = new Scanner(System.in);
         System.out.print("Type the path to your shadow file: ");
